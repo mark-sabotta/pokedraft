@@ -12,7 +12,7 @@ let fully = ["meowscarada", "skeledirge", "quaquaval", "oinkologne", "spidops", 
 "lilligant-hisuian", "breloom", "flapple", "appletun", "grumpig", "squawkabilly", "mismagius", "hariyama", 
 "crabominable", "salazzle", "donphan", "copperajah", "garchomp", "garganacl", "pelipper", "gyarados", 
 "barraskewda", "basculegion", "swalot", "persian", "persian-alolan", "perrserker", "drifblim", 
-"florges", "dugtrio", "dugtrio-alolan", "torkoal", "camerupt", "bronzong", "haxorus", "annihilape", 
+"florges", "dugtrio", "dugtrio-alolan", "torkoal", "camerupt", "bronzong", "haxorus", 
 "medicham", "lucario", "armarouge", "ceruledge", "whiscash", "bellibolt", "goodra", "goodra-hisuian", 
 "toxicroak", "kilowattrel", "vaporeon", "jolteon", "flareon", "espeon", "umbreon", "leafeon", "glaceon", 
 "sylveon", "dudunsparce", "sawsbuck", "farigiraf", "muk", "muk-alolan", "mabosstiff", "toxtricity", 
@@ -21,9 +21,9 @@ let fully = ["meowscarada", "skeledirge", "quaquaval", "oinkologne", "spidops", 
 "gogoat", "tauros", "tauros-paldean", "tauros-paldean-fire", "tauros-paldean-water", "pyroar", "skuntank", 
 "zoroark", "zoroark-hisuian", "weavile", "sneasler", "honchkrow", "gothitelle", "polteageist", "mimikyu", 
 "klefki", "indeedee", "indeedee-female", "brambleghast", "toedscruel", "tropius", "lurantis", "klawf", 
-"scovillain", "cacturne", "rabsca", "venomoth", "forretress", "kleavor", "scizor", "heracross", "espathra",
-"hippowdon", "krookodile", "sandaconda", "mudsdale", "volcarona", "salamence", "tinkaton", "hatterene", 
-"grimmsnarl", "wugtrio", "bombirdier", "palafin", "revavroom", "cyclizar", "orthworm", "sableye", "banette",
+"scovillain", "cacturne", "rabsca", "venomoth", "forretress", "kleavor", "scizor", "heracross",
+"hippowdon", "krookodile", "sandaconda", "mudsdale", "salamence", "tinkaton", "hatterene", 
+"grimmsnarl", "wugtrio", "bombirdier", "revavroom", "cyclizar", "orthworm", "sableye", "banette",
 "falinks", "hawlucha", "spiritomb", "noivern", "dragapult", "glimmora", "rotom", "houndstone", "oranguru", 
 "passimian", "komala", "tyranitar", "stonjourner", "eiscue", "pincurchin", "palossand", "slowbro",
 "slowbro-galarian", "slowking-galarian", "slowking", "gastrodon", "cloyster", "qwilfish", "overqwil", 
@@ -35,12 +35,79 @@ let fully = ["meowscarada", "skeledirge", "quaquaval", "oinkologne", "spidops", 
 "decidueye", "decidueye-hisuian", "rillaboom", "cinderace", "inteleon", "raichu-alolan"];
 
 
-const box = document.querySelector('.pokes')
-fully.map(function(poke){
+const box = document.querySelector('#pokes');
+const banned = document.querySelector('#banned');
+box.addEventListener("click", function(e){
+    if(e.target.tagName == 'IMG'){
+        banned.append(e.target);
+    }
+})
+banned.addEventListener("click", function(e){
+    if(e.target.tagName == 'IMG'){
+        box.append(e.target);
+    }
+})
+
+const post = function(poke, place){
     let img = document.createElement('img');
     img.src = `sprites/${poke}.png`;
     img.alt = poke;
     img.className = "pokemon";
-    box.append(img);
+    img.id = `${poke}`;
+    place.append(img);
     return;
+}
+
+
+fully.map(function(poke){
+    post(poke, box)
 });
+
+
+const generator = document.querySelector('#generate');
+const poolSize = document.querySelector('#pool-size');
+const teamone = document.querySelector("#teamone");
+const teamtwo = document.querySelector("#teamtwo");
+generator.addEventListener("click", function(){
+    
+    if(poolSize.value < 2){
+        poolSize.value = 2;
+    }
+    //select all remaining images after bans
+    let workingList = Array.from(document.querySelectorAll('#pokes img'));
+    let maxSize = Math.floor(workingList.length/2);
+    if(maxSize < 2){
+        alert("At least 2 pokemon must remain to generate teams");
+        return;
+    }
+
+
+    //correct for team sizes that are too large
+    if(poolSize.value > maxSize){
+        poolSize.value = maxSize;
+    }
+    teamone.innerHTML = '<p>Team One:</p>';
+    teamone.className = '';
+    teamtwo.innerHTML = '<p>Team Two:</p>';
+    teamtwo.className = '';
+    //convert working list to a list of pokemon names
+    workingList = workingList.map(function(mon){
+        return mon.id;
+    })
+
+    //Use Fisher-Yates to shuffle the available Pokemon
+    for(i = workingList.length -1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i+1));
+        let k = workingList[i];
+        workingList[i] = workingList[j];
+        workingList[j] = k;
+    }
+
+    for(j = 0; j < poolSize.value*2; j++) {
+        if(j < poolSize.value){
+            post(workingList[j], teamone);
+        }else{
+            post(workingList[j], teamtwo);
+        }
+    };
+})
