@@ -4,6 +4,7 @@ img.pokemon {
 }
 
 #teamone {
+    margin-left: 10%;
     width: 40%;
     background-color: aqua;
     display: inline-block;
