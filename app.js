@@ -34,17 +34,21 @@ let fully = ["meowscarada", "skeledirge", "quaquaval", "oinkologne", "spidops", 
 "typhlosion-hisuian", "samurott", "samurott-hisuian", "chesnaught", "delphox", "greninja", "carbink",
 "decidueye", "decidueye-hisuian", "rillaboom", "cinderace", "inteleon", "raichu-alolan"];
 
+let oneCopyString= '';
+let twoCopyString= '';
 
 const box = document.querySelector('#pokes');
 const banned = document.querySelector('#banned');
 box.addEventListener("click", function(e){
     if(e.target.tagName == 'IMG'){
         banned.append(e.target);
+        //banned.append(e.target.parentElement);
     }
 })
 banned.addEventListener("click", function(e){
     if(e.target.tagName == 'IMG'){
         box.append(e.target);
+        //box.append(e.target.parentElement);
     }
 })
 
@@ -58,9 +62,23 @@ const post = function(poke, place){
     return;
 }
 
+// const post = function(poke, place){
+//     let div = document.createElement('div');
+//     let img = document.createElement('img');
+//     img.src = `sprites/${poke}.png`;
+//     img.alt = `${poke}`;
+//     img.className = "pokemon";
+//     img.id = `${poke}`;;
+//     div.append(img);
+//     div.innerHTML = div.innerHTML + "<br>" + poke;
+//     place.append(div);
+
+//     return;
+// }
+
 
 fully.map(function(poke){
-    post(poke, box)
+    post(poke, box);
 });
 
 
@@ -68,6 +86,7 @@ const generator = document.querySelector('#generate');
 const poolSize = document.querySelector('#pool-size');
 const teamone = document.querySelector("#teamone");
 const teamtwo = document.querySelector("#teamtwo");
+//const teamCopy = document.querySelector("#copy-team")
 generator.addEventListener("click", function(){
     
     if(poolSize.value < 2){
@@ -90,6 +109,10 @@ generator.addEventListener("click", function(){
     teamone.className = '';
     teamtwo.innerHTML = '<p>Team Two:</p>';
     teamtwo.className = '';
+    //teamCopy.className = '';
+    //oneCopyString = 'Team One: ';
+    //twoCopyString = 'Team Two: ';
+
     //convert working list to a list of pokemon names
     workingList = workingList.map(function(mon){
         return mon.id;
@@ -106,8 +129,15 @@ generator.addEventListener("click", function(){
     for(j = 0; j < poolSize.value*2; j++) {
         if(j < poolSize.value){
             post(workingList[j], teamone);
+            //oneCopyString = oneCopyString + workingList[j] + ', ';
         }else{
             post(workingList[j], teamtwo);
+            //twoCopyString = twoCopyString + workingList[j] + ', ';
         }
     };
-})
+});
+
+teamCopy.addEventListener("click", function(){
+    navigator.clipboard.writeText(oneCopyString+twoCopyString);
+});
+
